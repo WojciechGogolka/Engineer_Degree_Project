@@ -28,6 +28,7 @@ os.environ["QT_FONT_DPI"] = "96"
 
 # Running
 > Before running the program remamber to unzip the images.zip package inside the project directory.
+> 
 > Inside your preferred terminal run the commands below depending on your system, remembering before installing Python 3.9> and PySide6 "pip install PySide6".
 > ## **Windows**:
 ```console
