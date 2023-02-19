@@ -1,0 +1,154 @@
+drop database if exists Urlops_Database_Main;
+create database Urlops_Database_Main;
+set names utf8;
+set character_set_client = utf8mb4;
+use Urlops_Database_Main;
+
+Create TABLE IF NOT EXISTS worker_personal_data(
+worker_id int NOT NULL AUTO_INCREMENT,
+worker_name varchar(50) NOT NULL,
+worker_lastname varchar(50) NOT NULL,
+worker_birthDate date NOT NULL,
+worker_isForeigner bool NOT NULL,
+worker_PESEL varchar(11) NOT NULL,
+worker_address varchar(50) NOT NULL,
+worker_zipCode varchar(5) NOT NULL,
+worker_city int NOT NULL,
+worker_phoneNumber varchar(12),
+worker_education int NOT NULL,
+PRIMARY KEY (worker_id),
+UNIQUE (worker_PESEL));
+
+Create TABLE IF NOT EXISTS worker_children(
+child_id int NOT NULL AUTO_INCREMENT,
+parent_id int NOT NULL,
+child_name varchar(50) NOT NULL,
+child_lastname varchar(50) NOT NULL,
+child_birthDate date NOT NULL,
+PRIMARY KEY (child_id));
+
+Create TABLE IF NOT EXISTS cities(
+city_id int NOT NULL AUTO_INCREMENT,
+city_name varchar(40) NOT NULL,
+PRIMARY KEY (city_id),
+UNIQUE (city_name));
+
+Create TABLE IF NOT EXISTS education_degrees(
+education_id int NOT NULL AUTO_INCREMENT,
+education_name varchar(40) NOT NULL,
+education_yearsWorkHist int(3) NOT NULL,
+PRIMARY KEY (education_id),
+UNIQUE (education_name));
+
+Create TABLE IF NOT EXISTS agreement_types(
+agreement_id int NOT NULL AUTO_INCREMENT,
+agreement_name varchar(40) NOT NULL,
+agreement_countToUrlop bool NOT NULL,
+PRIMARY KEY (agreement_id),
+UNIQUE (agreement_name));
+
+
+Create TABLE IF NOT EXISTS urlop_types(
+urlop_id int NOT NULL AUTO_INCREMENT,
+urlop_name varchar(40) NOT NULL,
+urlop_yearlyLimit int,
+PRIMARY KEY (urlop_id),
+UNIQUE (urlop_name));
+
+Create TABLE IF NOT EXISTS disability_degrees(
+disability_id int NOT NULL AUTO_INCREMENT,
+disability_name varchar(40) NOT NULL,
+disability_addUrlop int NOT NULL,
+PRIMARY KEY (disability_id),
+UNIQUE (disability_name));
+
+Create TABLE IF NOT EXISTS worker_invalid(
+invalid_id int NOT NULL AUTO_INCREMENT,
+invalid_workerID int NOT NULL,
+invalid_disabilityID int NOT NULL,
+invalid_start date NOT NULL,
+invalid_end date,
+PRIMARY KEY(invalid_id));
+
+Create TABLE IF NOT EXISTS worker_workHistory(
+history_id int NOT NULL AUTO_INCREMENT,
+history_workerID int NOT NULL,
+history_companyName varchar(255),
+history_dateStart date NOT NULL,
+history_dateEnd date NOT NULL,
+history_urlopVacation int,
+history_urlopBaby int,
+history_urlopRequest int,
+history_urlopUnpaid int,
+history_absenceUnexcused int,
+history_equivalent int,
+PRIMARY KEY(history_id));
+
+Create TABLE IF NOT EXISTS worker_agreements(
+workerAgreements_id int NOT NULL AUTO_INCREMENT,
+workerAgreements_workerID int NOT NULL,
+workerAgreements_agreementType int NOT NULL,
+workerAgreements_dateStart date NOT NULL,
+workerAgreements_dateEnd date,
+workerAgreements_time decimal NOT NULL,
+PRIMARY KEY(workerAgreements_id));
+
+Create TABLE IF NOT EXISTS worker_urlops(
+urlop_id int NOT NULL AUTO_INCREMENT,
+urlop_workerID int NOT NULL,
+urlop_typeNumber int NOT NULL,
+urlop_dateStart date NOT NULL,
+urlop_dateEnd date NOT NULL,
+urlop_days int NOT NULL,
+urlop_hours float NOT NULL,
+PRIMARY KEY(urlop_id));
+
+Alter Table worker_urlops
+Add foreign KEY (urlop_workerID) references worker_personal_data(worker_id),
+Add foreign KEY (urlop_typeNumber) references urlop_types(urlop_id);
+
+Alter Table worker_agreements
+Add foreign KEY (workerAgreements_workerID) references worker_personal_data(worker_id),
+Add foreign KEY (workerAgreements_agreementType) references agreement_types(agreement_id);
+
+Alter Table worker_invalid
+Add foreign KEY (invalid_workerID) references worker_personal_data(worker_id),
+Add foreign KEY (invalid_disabilityID) references disability_degrees(disability_id);
+
+Alter Table worker_children
+Add foreign KEY (parent_id) references worker_personal_data(worker_id);
+
+Alter Table worker_workHistory
+Add foreign KEY (history_workerID) references worker_personal_data(worker_id);
+
+Alter Table worker_personal_data
+Add foreign KEY (worker_city) references cities(city_id),
+Add foreign KEY (worker_education) references education_degrees(education_id);
+
+INSERT INTO urlop_types(urlop_name) VALUES ('Urlop wypoczynkowy');
+INSERT INTO urlop_types(urlop_name,urlop_yearlyLimit) VALUES ('Opieka nad zdrowym dzieckiem',2);
+INSERT INTO urlop_types(urlop_name,urlop_yearlyLimit) VALUES ('Urlop na żądanie',4);
+INSERT INTO urlop_types(urlop_name) VALUES ('Okolicznościowy');
+INSERT INTO urlop_types(urlop_name) VALUES ('Bezpłatny');
+INSERT INTO urlop_types(urlop_name) VALUES ('Ekwiwalent');
+
+INSERT INTO disability_degrees(disability_name,disability_addUrlop) VALUES('Lekka',0);
+INSERT INTO disability_degrees(disability_name,disability_addUrlop) VALUES('Umiarkowana',10);
+INSERT INTO disability_degrees(disability_name,disability_addUrlop) VALUES('Ciężka',10);
+
+INSERT INTO education_degrees(education_name,education_yearsWorkHist) VALUES ('Podstawowe',0);
+INSERT INTO education_degrees(education_name,education_yearsWorkHist) VALUES ('Zawodowe',3);
+INSERT INTO education_degrees(education_name,education_yearsWorkHist) VALUES ('Średnie licealne',4);
+INSERT INTO education_degrees(education_name,education_yearsWorkHist) VALUES ('Średnie techniczne',5);
+INSERT INTO education_degrees(education_name,education_yearsWorkHist) VALUES ('Szkoła policealna',6);
+INSERT INTO education_degrees(education_name,education_yearsWorkHist) VALUES ('Wyższe',8);
+
+INSERT INTO agreement_types(agreement_name,agreement_countToUrlop) VALUES ('Umowa o pracę',1);
+
+
+
+
+
+
+
+
